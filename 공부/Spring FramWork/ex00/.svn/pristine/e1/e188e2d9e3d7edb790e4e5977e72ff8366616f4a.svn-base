@@ -1,0 +1,11 @@
+package org.zerock.message.mapper;
+
+import java.util.List;
+
+import org.zerock.message.vo.MessageVO;
+
+public interface MessageMapper {
+
+	public List<MessageVO> getNewMessageList(String id);
+	
+}

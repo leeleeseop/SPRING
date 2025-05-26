@@ -1,0 +1,26 @@
+package org.zerock.message.service;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
+import org.zerock.message.mapper.MessageMapper;
+import org.zerock.message.vo.MessageVO;
+
+import lombok.Setter;
+
+@Service
+@Qualifier("messageServiceImpl")
+public class MessageServiceImpl implements MessageService {
+
+	@Setter(onMethod_ = @Autowired)
+	private MessageMapper mapper;
+	
+	@Override
+	public List<MessageVO> getNewMessageList(String id) {
+		// TODO Auto-generated method stub
+		return mapper.getNewMessageList(id);
+	}
+
+}

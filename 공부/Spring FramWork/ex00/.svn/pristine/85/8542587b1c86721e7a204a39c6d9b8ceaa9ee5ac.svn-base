@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.zerock.message.mapper.MessageMapper">
+
+	<!-- 새로운 메시지 리스트 4개 가져오기 -->
+	<select id="getNewMessageList" resultType="org.zerock.message.vo.MessageVO">
+		select no, content, senderId, senderName, senderPhoto, sendDate
+		from (
+			select rownum rnum, no, content, senderId, senderName, senderPhoto, sendDate
+			from (
+				select
+					m.no, m.content, m.senderId, sm.name senderName, sm.photo senderPhoto, m.sendDate
+				from
+					message m, member sm
+				where 
+					(
+						accepterId = #{accepter}
+						and acceptDate is null
+					) and (
+						m.senderId = sm.id
+					)
+				order by m.no desc
+			)
+		)
+		where rnum between #{startRow} and #{endRow}
+	</select>
+
+	<!-- 리스트 관련 -->
+	<select id="list" resultType="org.zerock.message.vo.MessageVO">
+		select
+			no, senderId, senderName, sendDate, senderPhoto,
+			accepterId, accepterName, acceptDate, accepterPhoto
+		from (
+			select
+				rownum rnum, no, senderId, senderName, sendDate, senderPhoto,
+				accepterId, accepterName, acceptDate, accepterPhoto
+			from (
+				select
+					m.no, m.senderId, sm.name senderName, m.sendDate, sm.photo senderPhoto,
+					m.accepterId, am.name accepterName, m.acceptDate, am.photo accepterPhoto
+				from
+					message m, member sm, member am
+				where
+					<trim prefixOverrides="and">
+						<include refid="search"/>
+						<include refid="searchMode"/>
+						and
+						(m.senderId = sm.id and m.accepterId = am.id)
+					</trim>
+				order by no desc
+			)
+		)
+		where rnum between #{startRow} and #{endRow}
+	</select>
+	
+	<select id="getTotalRow" resultType="Long">
+		select count(*)
+		from message
+		where
+			<trim prefixOverrides="and">
+				<include refid="search"/>
+				<include refid="searchMode"/>
+			</trim>
+	</select>
+	
+	<sql id="search">
+		<if test="word != null and !word.equals('')">
+		and (
+			<trim prefixOverrides="or">
+				<if test="key.indexOf('i') >= 0">
+					or (accepterId like '%' || #{word} || '%' or senderId like '%' || #{word} || '%')
+				</if>
+				<if test="key.indexOf('c') >= 0">
+					or content like '%' || #{word} || '%'
+				</if>
+			</trim>
+		)	
+		</if>
+	</sql>
+	
+	<sql id="searchMode">
+		and (
+		<choose>
+		<!-- 모드 : 1 - 받은 메시지, 2 - 보낸 메시지, 3 - 모든 메시지 -->
+			<when test="acceptMode == 1">
+				accepterId = #{accepter }
+			</when>
+			<when test="acceptMode == 2">
+				senderId = #{accepter }
+			</when>
+			<when test="acceptMode == 3">
+				accepterId = #{accepter } or senderId = #{accepter }
+			</when>
+		</choose>
+		)
+	</sql>
+
+	<!-- 2. view 관련 -->
+</mapper>

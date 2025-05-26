@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.zerock.message.mapper.MessageMapper">
+
+	<!-- 새로운 메시지 리스트 4개 가져오기 -->
+	<select id="getNewMessageList" resultType="org.zerock.message.vo.MessageVO">
+		select
+			m.no, m.content, m.senderId, sm.name senderName, sm.photo senderPhoto, m.sendDate
+		from
+			message m, member sm
+		where 
+			(
+				accepterId = #{id}
+				and acceptDate is null
+			) and (
+				m.senderId = sm.id
+			)
+		order by m.no desc
+	</select>
+
+
+</mapper>

@@ -1,0 +1,112 @@
+-- 1. 객체 제거(FK -> PK)
+    -- 1-8. 상품 가격
+    DROP TABLE price CASCADE CONSTRAINTS;
+    -- 1-7. 상품옵셥
+    DROP TABLE goods_option CASCADE CONSTRAINTS;
+    -- 1-6. 상품사이즈&색상
+    DROP TABLE goods_sizeColor CASCADE CONSTRAINTS;
+    -- 1-5. 상품이미지
+    DROP TABLE goods_image CASCADE CONSTRAINTS;
+    -- 1-4. 상품
+    DROP TABLE goods CASCADE CONSTRAINTS;
+    -- 1-3. 색상(기본)
+    DROP TABLE color CASCADE CONSTRAINTS;
+    -- 1-2. 사이즈(기본)
+    DROP TABLE size CASCADE CONSTRAINTS;
+    -- 1-1. 카테고리
+    DROP TABLE category CASCADE CONSTRAINTS;
+
+    DROP SEQUENCE price_seq;
+    DROP SEQUENCE goods_option_seq;
+    DROP SEQUENCE goods_sizeColor_seq;
+    DROP SEQUENCE goods_image_seq;
+    DROP SEQUENCE goods_seq;
+    DROP SEQUENCE color_seq;
+    DROP SEQUENCE size_seq;
+
+-- 2. 객체 생성 (PK -> FK : 판매가 되면 지우면 안된다.)
+    -- << 테이블 >>
+    -- 2-1. 카테고리
+    CREATE TABLE category(
+        cate_code1 NUMBER(3),
+        cate_code2 NUMBER(3) DEFAULT 0,
+        cate_name VARCHAR2(30) NOT NULL,
+        CONSTRAINT category_pk PRIMARY KEY (cate_code1, cate_code2)
+    );
+    -- 2-2. 사이즈(기본)
+    CREATE TABLE size(
+        size_no NUMBER PRIMARY KEY,
+        cate_code1 NUMBER(3) NOT NULL,
+        cate_code2 NUMBER(3) NOT NULL,
+        size_name VARCHAR2(30) NOT NULL,
+        CONSTRAINT cate_size_fk FOREIGN KEY(cate_code1,cate_code2)
+        REFERENCES category(cate_code1,cate_code2)
+    );
+    -- 2-3. 색상(기본)
+     CREATE TABLE color(
+        color_no NUMBER PRIMARY KEY ,
+        cate_code1 NUMBER(3) NOT NULL,
+        cate_code2 NUMBER(3) NOT NULL,
+        color_name VARCHAR2(30) NOT NULL,
+        CONSTRAINT cate_color_fk FOREIGN KEY(cate_code1,cate_code2)
+        REFERENCES category(cate_code1,cate_code2)
+    );
+   -- 2-4. 상품
+     CREATE TABLE goods(
+        goods_no NUMBER PRIMARY KEY,
+        cate_code1 NUMBER(3) NOT NULL,
+        cate_code2 NUMBER(3) NOT NULL,
+        goods_name VARCHAR2(300) NOT NULL,
+        company VARCHAR2(60) NOT NULL,
+        product_Date DATE NOT NULL,
+        image_name VARCHAR2(200) NOT NULL,
+        detail_image_name VARCHAR2(200),
+        content VARCHAR2(2000),
+        CONSTRAINT cate_color_fk FOREIGN KEY(cate_code1,cate_code2)
+        REFERENCES category(cate_code1,cate_code2)
+    );
+   -- 2-5. 상품이미지
+    CREATE TABLE goods_image(
+        image_no NUMBER PRIMARY KEY,
+        goods_no NUMBER REFERENCES goods(goods_no) NOT NULL,
+        image_name VARCHAR2(200) NOT NULL
+    );
+    -- 2-6. 상품사이즈&색상
+    CREATE TABLE goods_sizeColor(
+        goods_sizeColor_no NUMBER PRIMARY KEY,
+        goods_no NUMBER REFERENCES goods(goods_no) NOT NULL,
+        cate_code1 NUMBER(3) NOT NULL,
+        cate_code2 NUMBER(3) NOT NULL,
+        CONSTRAINT cate_color_fk FOREIGN KEY(cate_code1,cate_code2)
+        REFERENCES category(cate_code1,cate_code2)
+    );
+   -- 2-7. 상품옵셥
+    CREATE TABLE goods_option(
+        goods_option_no NUMBER PRIMARY KEY,
+        goods_no NUMBER REFERENCES goods(goods_no) NOT NULL,
+        option_name VARCHAR2(300) NOT NULL
+    );
+    -- 2-8. 상품 가격
+    CREATE TABLE price(
+        price_no NUMBER PRIMARY KEY,
+        goods_no NUMBER REFERENCES goods(goods_no) NOT NULL,
+        price NUMBER(10) NOT NULL,
+        discount NUMBER(10) DEFAULT 0,
+        discount_rate NUMBER(3) DEFAULT 0,
+        delivery_charge NUMBER(5) DEFAULT 0,
+        saved_rate NUMBER(3) DEFAULT 0,
+        sale_startDate DATE DEFAULT sysdate,
+        sale_endDate DATE DEFAULT '9999-12-31'
+    );
+
+    -- << 시퀀스 >>
+    CREATE SEQUENCE price_seq;
+    CREATE SEQUENCE goods_option_seq;
+    CREATE SEQUENCE goods_sizeColor_seq;
+    CREATE SEQUENCE goods_image_seq;
+    CREATE SEQUENCE goods_seq;
+    CREATE SEQUENCE color_seq;
+    CREATE SEQUENCE size_seq;
+
+
+-- 3. 샘플 데이터

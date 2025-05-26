@@ -1,0 +1,9 @@
+@charset "UTF-8";
+.dataRow>.card-header{
+	background: #e0e0e0
+}
+.dataRow:hover{
+	color: black;
+	border-color: #98b1e6;
+	cursor: pointer;
+}

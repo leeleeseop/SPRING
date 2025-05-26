@@ -1,0 +1,23 @@
+package org.zerock.cart.vo;
+
+import java.util.List;
+
+import lombok.Data;
+
+@Data
+public class CartVO {
+
+	private long cart_no; //seq 사용 - cycle 순환처리:최대->1
+	private long goods_no;
+	private String goods_name;
+	private long size_no;
+	private String size_name;
+	private long color_no;
+	private String color_name;
+	private long goods_option_no;
+	private String option_name;
+	private int count;
+	
+	private List<CartVO> list;
+	
+}
